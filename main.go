@@ -16,35 +16,24 @@ import (
 	"time"
 )
 
-/*
-Share files quickly
-$ ./share ./static
-Starting server...
-Access server on :url (clearnet).
-Password: :abc-difficult-password
-*/
-
 // ./share ./static
 // ./share ./mydocs -port 8080
-// share <fp> [flags | kwargs]
-// -port :int  // default 8080   // or; -port 8080
-// -https OR ./serve https ./mydocs -port 5000
-// -log :fp
-// -exclude glob
-// -password <string>
+// -port <int>  
+// -log <fp>|Stdout|Stderr
+// -exclude <glob>:<glob2>:...
+// -password <string>|random
 
 // share ./static -password=<STRING>
 // share ./static -log=OPTION // OPTION = {Stdout, Stderr, <fp>}
 // share ./public -exclude *.pem
 // share ./public -port 8080
-// share ./public -https
 const HttpsPort = ":433"
 
 var Ip net.IP
 var (
 	Port     = flag.String("port", "8080", "specify port to listen on")
-	Password = flag.String("password", "", "put content behind password")
-	Exclude  = flag.String("exclude", "", "files matching the expression are not served")
+	Password = flag.String("password", "", "put content behind basic http auth, 'random' generates password")
+	Exclude  = flag.String("exclude", "", "files matching the glob are not served")
 	Log      = flag.String("log", "Stdout", "provide a file to log to; special names 'Stdout' and 'Stderr'")
 )
 
@@ -52,9 +41,9 @@ func usage() {
 	var callName string
 	switch runtime.GOOS {
 	case "windows":
-		callName = "shared.exe"
+		callName = "share.exe"
 	case "linux", "darwin":
-		callName = "./shared"
+		callName = "./share"
 	}
 	const msg = `Usage: 
 	%s <filepath> [options]
